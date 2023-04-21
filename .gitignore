@@ -1,0 +1,43 @@
+!.gitignore
+!/scripts
+/scripts/_old
+/scripts/Pipe/Log
+/scripts/7.1 Ingreso Esperado General - Monografia
+/scripts/7.1 Ingreso Esperado General_old
+/scripts/7.1 Ingreso Esperado General - Monografia.rar
+/scripts/7.2 Resultados elecciones v2022.06.10.rar
+
+*.cpg
+*.shp
+*.shx
+*.prj
+*.svg
+*.png
+*.pyc
+*.qgz
+*.dbf
+*.xls
+*.xlsx
+*.dta
+*.docx
+*.pdf
+*.gph
+*.csv
+*.tsv
+*.shp
+*.shf
+*.dbf
+*.db
+*.json
+*.html
+*.png
+*.txt
+*.rar
+*.zip
+*.m4a
+*.mpeg
+*.avi
+*.mp3
+*.mkv
+*.mp4
+*.csv

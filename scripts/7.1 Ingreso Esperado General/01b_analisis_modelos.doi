@@ -1,0 +1,71 @@
+*****************************************
+********** Analisis modelos 
+*****************************************
+
+****************** variable original EPH : ipcf_ppp11 y en log: ln_ipcf_ppp11 
+
+loc tipo = "mco probit"
+forvalues i = 1(1)$total_bases {
+	foreach t in `tipo' {
+		use "${path_datain}\\EPH SEDLAS\\`base_`i''_v03_M_v01_A_SEDLAC-03_all.dta", clear
+		qui include "${path_scripts}\01a_variables_censo.doi"
+		*use "${path_dataout}\compara\EPH`i'", clear
+		capture drop nn* ee* cc*
+		
+		
+		if "`t'" == "mco" estimates use "${path_dataout}\ster\MCO_ingreso_`i'"
+		if "`t'" == "probit" estimates use "${path_dataout}\ster\probit_pobreza_`i'"
+		
+		if "`t'" == "mco" {
+			predict nn_ln_`t'
+			gen nn_`t' = .
+			replace nn_`t' = exp(nn_ln_`t')
+		}
+
+		if "`t'" == "probit" {
+			predict nn_`t'
+			gen nn_ln_`t' = .
+			replace nn_ln_`t' = log(nn_`t')
+		}
+
+		**** diferencias
+		capture gen nn_dif_`t' = .
+		replace nn_dif_`t' = ipcf_ppp11 / nn_`t'
+		
+		capture gen nn_res_`t' = .
+		replace nn_res_`t' = ipcf_ppp11 - nn_`t'
+		
+		capture gen nn_ln_res_`t' = .
+		replace nn_ln_res_`t' = ln_ipcf_ppp11 - nn_ln_`t'
+			
+		cuantiles ipcf_ppp11, ncuantiles(100) orden_aux(ipcf_ppp11) generate(cc_ipcf_ppp11)
+		cuantiles nn_`t', ncuantiles(100) orden_aux(nn_`t') generate(cc_nn_`t')
+		
+		clonevar ee_dif_`t'`i' = nn_dif_`t'
+		clonevar ee_`t'`i'= nn_`t'
+		clonevar ee_ln_`t'`i' = nn_ln_`t'
+		clonevar ee_nn_`t'`i' = cc_nn_`t' 
+		clonevar ee_ipcf_ppp11`i' = cc_nn_`t'
+		clonevar ee_res_`t'`i' = nn_res_`t'
+		
+		foreach var of varlist ln_ipcf_ppp11 nivel hombre edad edad2 edad1217 edad1824 edad2540 edad4164 edad65 pric seci secc supi supc hv_* miembros miembros2 jj_* cc_* jefe reg2 reg3 reg4 reg5 reg6 reg7 reg8 reg9 reg10 reg13 reg14 reg15 reg17 reg18 reg19 reg20 reg22 reg23 reg25 reg26 reg27 reg29 reg30 reg31 reg32 reg33 reg34 reg36 {
+			clonevar zz_`var'_`i'= `var'
+				}
+
+		save "${path_dataout}\compara\EPH`i'_`t'", replace
+		}
+}
+
+
+use "${path_dataout}\compara\EPH1", clear
+keep cc_ipcf_ppp11 
+save "${path_dataout}\analisis_modelos.dta", replace
+
+forvalues i = 1(1)$total_bases {
+	foreach t in `tipo' {
+		merge m:m cc_ipcf_ppp11 using "${path_dataout}\compara\EPH`i'_`t'", keepusing(ee* zz*)
+		capture drop _merg
+		}
+}
+
+save "${path_dataout}\analisis_modelos.dta", replace

@@ -1,0 +1,23 @@
+*ipcf_ppp05
+*linea 4usd 2005
+* en cedlas ahora está en string
+*loc varreg ="region_est2"
+loc varreg = "aglomerado"
+keep if `varreg'<=36
+
+*capture drop jefe conyuge hijo nro_hijos nivedu prii pric seci secc supi supc exp asal grupo_lab categ_lab pobre_ext pobre_mod pobre_ext2 pobre_mod2 reg2-reg36 edad2 miemhabi hv_* edad11 edad1217 edad1824 edad2540 edad4164 edad65 miembros2 aedu2 jj_* perii n_perii_h *nbi*
+*d jefe conyuge hijo nro_hijos nivedu prii pric seci secc supi supc exp asal grupo_lab categ_lab perii n_perii_h 
+capture drop pobre_ext pobre_mod pobre_ext2 pobre_mod2 reg2-reg36 edad2 
+capture drop miemhabi hv_* edad11 edad1217 edad1824 edad2540 edad4164 edad65 miembros2 aedu2 *nbi*
+
+*capture gen cohh =1
+capture run c:\cedlas\cedlas\do\fgt.do
+*capture ren componente com
+
+*fgt ipcf [w=pondera] if cohh==1, z(lp_extrema) a(0)
+*fgt ipcf [w=pondera] if cohh==1, z(lp_moderada) a(0)
+
+capture drop ipcf_ste 
+clonevar ipcf_ste =ipcf
+replace  ipcf_ste =ipcf-itrane if itrane!=.
+label var ipcf_ste "ipcf sin trans. estatales (itrane)"

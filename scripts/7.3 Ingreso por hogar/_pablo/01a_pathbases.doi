@@ -1,0 +1,77 @@
+****** bases (todas)
+
+*loc base_completo_25 "\ARG\ARG_2016_EPHC\ARG_2016_s1_v01_M_v01_A_SEDLAC-03"
+
+loc base_1  "ARG_2003_S2"
+loc base_2  "ARG_2004_S1"
+loc base_3  "ARG_2004_S2"
+loc base_4  "ARG_2005_S1"
+loc base_5  "ARG_2005_S2"
+loc base_6  "ARG_2006_S1"
+loc base_7  "ARG_2006_S2"
+loc base_8  "ARG_2007_S1"
+loc base_9  "ARG_2007_S2"
+loc base_10 "ARG_2008_S1"
+loc base_11 "ARG_2008_S2"
+loc base_12 "ARG_2009_S1"
+loc base_13 "ARG_2009_S2"
+loc base_14 "ARG_2010_S1"
+loc base_15 "ARG_2010_S2"
+loc base_16 "ARG_2011_S1"
+loc base_17 "ARG_2011_S2"
+loc base_18 "ARG_2012_S1"
+loc base_19 "ARG_2012_S2"
+loc base_20 "ARG_2013_S1"
+loc base_21 "ARG_2013_S2"
+loc base_22 "ARG_2014_S1"
+loc base_23 "ARG_2014_S2"
+loc base_24 "ARG_2015_S1"
+loc base_25 "ARG_2016_S2"
+loc base_26 "ARG_2017_S1"
+loc base_27 "ARG_2017_S2"
+loc base_28 "ARG_2018_S1"
+loc base_29 "ARG_2018_S2"
+loc base_30 "ARG_2019_S1"
+
+loc base_completo_1  "sedlac\ARG\ARG_2003_EPHC\ARG_2003_EPHC-S2_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2003_EPHC-S2_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_2  "sedlac\ARG\ARG_2004_EPHC\ARG_2004_EPHC-S1_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2004_EPHC-S1_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_3  "sedlac\ARG\ARG_2004_EPHC\ARG_2004_EPHC-S2_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2004_EPHC-S2_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_4  "sedlac\ARG\ARG_2005_EPHC\ARG_2005_EPHC-S1_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2005_EPHC-S1_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_5  "sedlac\ARG\ARG_2005_EPHC\ARG_2005_EPHC-S2_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2005_EPHC-S2_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_6  "sedlac\ARG\ARG_2006_EPHC\ARG_2006_EPHC-S1_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2006_EPHC-S1_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_7  "sedlac\ARG\ARG_2006_EPHC\ARG_2006_EPHC-S2_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2006_EPHC-S2_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_8  "sedlac\ARG\ARG_2007_EPHC\ARG_2007_EPHC-S1_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2007_EPHC-S1_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_9  "sedlac\ARG\ARG_2007_EPHC\ARG_2007_EPHC-S2_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2007_EPHC-S2_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_10 "sedlac\ARG\ARG_2008_EPHC\ARG_2008_EPHC-S1_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2008_EPHC-S1_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_11 "sedlac\ARG\ARG_2008_EPHC\ARG_2008_EPHC-S2_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2008_EPHC-S2_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_12 "sedlac\ARG\ARG_2009_EPHC\ARG_2009_EPHC-S1_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2009_EPHC-S1_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_13 "sedlac\ARG\ARG_2009_EPHC\ARG_2009_EPHC-S2_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2009_EPHC-S2_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_14 "sedlac\ARG\ARG_2010_EPHC\ARG_2010_EPHC-S1_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2010_EPHC-S1_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_15 "sedlac\ARG\ARG_2010_EPHC\ARG_2010_EPHC-S2_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2010_EPHC-S2_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_16 "sedlac\ARG\ARG_2011_EPHC\ARG_2011_EPHC-S1_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2011_EPHC-S1_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_17 "sedlac\ARG\ARG_2011_EPHC\ARG_2011_EPHC-S2_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2011_EPHC-S2_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_18 "sedlac\ARG\ARG_2012_EPHC\ARG_2012_EPHC-S1_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2012_EPHC-S1_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_19 "sedlac\ARG\ARG_2012_EPHC\ARG_2012_EPHC-S2_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2012_EPHC-S2_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_20 "sedlac\ARG\ARG_2013_EPHC\ARG_2013_EPHC-S1_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2013_EPHC-S1_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_21 "sedlac\ARG\ARG_2013_EPHC\ARG_2013_EPHC-S2_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2013_EPHC-S2_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_22 "sedlac\ARG\ARG_2014_EPHC\ARG_2014_EPHC-S1_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2014_EPHC-S1_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_23 "sedlac\ARG\ARG_2014_EPHC\ARG_2014_EPHC-S2_v03_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2014_EPHC-S2_v03_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_24 "sedlac\ARG\ARG_2015_EPHC\ARG_2015_EPHC-S1_v03_M_v02_A_SEDLAC-03\Data\Harmonized\ARG_2015_EPHC-S1_v03_M_v02_A_SEDLAC-03_all.dta"
+loc base_completo_25 "sedlac\ARG\ARG_2016_EPHC\ARG_2016_EPHC-S2_v02_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2016_EPHC-S2_v02_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_26 "sedlac\ARG\ARG_2017_EPHC\ARG_2017_EPHC-S1_v02_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2017_EPHC-S1_v02_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_27 "sedlac\ARG\ARG_2017_EPHC\ARG_2017_EPHC-S2_v02_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2017_EPHC-S2_v02_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_28 "sedlac\ARG\ARG_2018_EPHC\ARG_2018_EPHC-S1_v02_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2018_EPHC-S1_v02_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_29 "sedlac\ARG\ARG_2018_EPHC\ARG_2018_EPHC-S2_v01_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2018_EPHC-S2_v01_M_v01_A_SEDLAC-03_all.dta"
+loc base_completo_30 "sedlac\ARG\ARG_2019_EPHC\ARG_2019_EPHC-S1_v01_M_v01_A_SEDLAC-03\Data\Harmonized\ARG_2019_EPHC-S1_v01_M_v01_A_SEDLAC-03_all.dta"
+
+* bases a estimar probit
+loc bini = 1
+loc bfin = 30
+
+* bases a estimar armar predict
+loc predini = 30
+loc predfin = 30
+* probits a incluir en las bases con predict
+loc prbini = 1
+loc prbfin = 30
+

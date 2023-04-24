@@ -1,0 +1,189 @@
+*ipcf_ppp05
+*linea 4usd 2005
+keep if region_est2<=36
+
+gen lp4_05=4*30.42
+gen cohh =1
+capture run j:\cedlas\cedlas\do\fgt.do
+capture ren componente com
+capture drop __*
+
+*
+* Identifica al jefe 
+gen     jefe = 1		if  relacion==1
+replace jefe = 0		if  relacion!=1
+replace jefe = .		if  relacion==. | hogarsec==1
+
+/*(************************************************************************************************************************************************************************ 
+*-------------------------------------------------------------	2.7: Variables educativas  --------------------------------------------------------------------------------
+************************************************************************************************************************************************************************)*/
+
+	
+* Dummy del nivel educativo 
+gen     prii = 0		if  nivel>=0 & nivel<=6
+replace prii = 1		if  nivel==0 | nivel==1
+
+gen     pric = 0		if  nivel>=0 & nivel<=6
+replace pric = 1		if  nivel==2
+
+gen     seci = 0		if  nivel>=0 & nivel<=6
+replace seci = 1		if  nivel==3
+
+gen     secc = 0		if  nivel>=0 & nivel<=6
+replace secc = 1		if  nivel==4
+
+gen     supi = 0		if  nivel>=0 & nivel<=6
+replace supi = 1		if  nivel==5
+
+gen     supc = 0		if  nivel>=0 & nivel<=6
+replace supc = 1		if  nivel==6
+
+
+
+*creo variables para regresion (por aglomerado)
+loc varreg ="region_est2"
+gen reg2	 =0	if region_est2>=2 & region_est2<=36
+gen reg3	 =0	if region_est2>=2 & region_est2<=36  
+gen reg4	 =0	if region_est2>=2 & region_est2<=36
+gen reg5	 =0	if region_est2>=2 & region_est2<=36
+gen reg6	 =0	if region_est2>=2 & region_est2<=36
+gen reg7	 =0	if region_est2>=2 & region_est2<=36
+gen reg8	 =0	if region_est2>=2 & region_est2<=36
+gen reg9	 =0	if region_est2>=2 & region_est2<=36
+gen reg10	 =0	if region_est2>=2 & region_est2<=36
+gen reg12	 =0	if region_est2>=2 & region_est2<=36
+gen reg13	 =0	if region_est2>=2 & region_est2<=36
+gen reg14	 =0	if region_est2>=2 & region_est2<=36
+gen reg15	 =0	if region_est2>=2 & region_est2<=36
+gen reg17	 =0	if region_est2>=2 & region_est2<=36
+gen reg18	 =0	if region_est2>=2 & region_est2<=36
+gen reg19	 =0	if region_est2>=2 & region_est2<=36
+gen reg20	 =0	if region_est2>=2 & region_est2<=36
+gen reg22	 =0	if region_est2>=2 & region_est2<=36
+gen reg23	 =0	if region_est2>=2 & region_est2<=36
+gen reg25	 =0	if region_est2>=2 & region_est2<=36
+gen reg26	 =0	if region_est2>=2 & region_est2<=36
+gen reg27	 =0	if region_est2>=2 & region_est2<=36
+gen reg29	 =0	if region_est2>=2 & region_est2<=36
+gen reg30	 =0	if region_est2>=2 & region_est2<=36
+gen reg31	 =0	if region_est2>=2 & region_est2<=36
+gen reg32	 =0	if region_est2>=2 & region_est2<=36
+gen reg33	 =0	if region_est2>=2 & region_est2<=36
+gen reg34	 =0	if region_est2>=2 & region_est2<=36
+gen reg36	 =0	if region_est2>=2 & region_est2<=36
+
+replace reg2   =1 if region_est2==2        
+replace reg3   =1 if region_est2==3        
+replace reg4   =1 if region_est2==4        
+replace reg5   =1 if region_est2==5        
+replace reg6   =1 if region_est2==6        
+replace reg7   =1 if region_est2==7        
+replace reg8   =1 if region_est2==8        
+replace reg9   =1 if region_est2==9        
+replace reg10  =1 if region_est2==10       
+replace reg12  =1 if region_est2==12       
+replace reg13  =1 if region_est2==13       
+replace reg14  =1 if region_est2==14       
+replace reg15  =1 if region_est2==15       
+replace reg17  =1 if region_est2==17       
+replace reg18  =1 if region_est2==18       
+replace reg19  =1 if region_est2==19       
+replace reg20  =1 if region_est2==20       
+replace reg22  =1 if region_est2==22       
+replace reg23  =1 if region_est2==23       
+replace reg25  =1 if region_est2==25       
+replace reg26  =1 if region_est2==26       
+replace reg27  =1 if region_est2==27       
+replace reg29  =1 if region_est2==29       
+replace reg30  =1 if region_est2==30       
+replace reg31  =1 if region_est2==31       
+replace reg32  =1 if region_est2==32       
+replace reg33  =1 if region_est2==33       
+replace reg34  =1 if region_est2==34       
+replace reg36  =1 if region_est2==36   
+
+
+gen edad2=edad*edad
+* variables de vivienda
+sort id com
+*		Miembros por habitacion 
+gen miemhabi=miembros/habita 
+label var miemhabi "Miembros por habitacion"
+
+foreach var of varlist precaria matpreca agua banio cloacas propieta miemhabi {
+	by id: egen hv_`var'=max(`var')
+}
+
+
+* probabilidad de ser pobre
+gen edad11=.
+replace edad11= 0 if edad!=.
+replace edad11= 1 if edad<12
+
+gen edad1217=.
+replace edad1217= 0 if edad!=.
+replace edad1217= 1 if edad>=12 & edad<18
+
+gen edad1824=.
+replace edad1824= 0 if edad!=.
+replace edad1824= 1 if edad>=18 & edad<25
+
+gen edad2540=.
+replace edad2540= 0 if edad!=.
+replace edad2540= 1 if edad>=25 & edad<41
+
+gen edad4164=.
+replace edad4164= 0 if edad!=.
+replace edad4164= 1 if edad>=41 & edad<65
+
+
+gen edad65=.
+replace edad65= 0 if edad!=.
+replace edad65= 1 if edad>=65 & edad<.
+
+gen miembros2= miembros*miembros
+
+
+* datos del jefe
+capture drop aux*
+foreach var of varlist edad edad2 pric seci secc supi supc {
+	gen aux =`var' if jefe ==1
+	egen jj_`var'=max(aux), by(id)
+	drop aux
+}
+
+fgt ingreso_hd [w=pondera] if cohh==1, z(lp_extrema) a(0)
+fgt ingreso_hd [w=pondera] if cohh==1, z(lp_moderada) a(0)
+fgt ingreso2_hd [w=pondera] if cohh==1, z(lp_extrema) a(0)
+fgt ingreso2_hd [w=pondera] if cohh==1, z(lp_moderada) a(0)
+* pobreza oficial
+* variable de ingreso equivalente oficial
+* ingreso_hd
+* lineas
+* lp_extrema 
+* lp_moderada
+*gen pobre_4usd =.
+*replace pobre_4usd =0 if ipcf_ppp05>=lp4_05 & ipcf_ppp05<. & cohh==1
+*replace pobre_4usd =1 if ipcf_ppp05<lp4_05  & cohh==1
+*ta pobre_4usd [w=pondera]
+
+gen pobre_ext =.
+replace pobre_ext =0 if ingreso_hd>=lp_extrema & ingreso_hd<. & cohh==1
+replace pobre_ext =1 if ingreso_hd<lp_extrema  & cohh==1
+ta pobre_ext [w=pondera]
+
+gen pobre_mod =.
+replace pobre_mod =0 if ingreso_hd>=lp_moderada & ingreso_hd<. & cohh==1
+replace pobre_mod =1 if ingreso_hd<lp_moderada & cohh==1
+ta pobre_mod [w=pondera]
+
+* ingreso sin transferencias estatales (v4_m v5_m v11_m)
+gen pobre_ext2 =.
+replace pobre_ext2 =0 if ingreso2_hd>=lp_extrema & ingreso2_hd<. & cohh==1
+replace pobre_ext2 =1 if ingreso2_hd<lp_extrema  & cohh==1
+ta pobre_ext [w=pondera]
+
+gen pobre_mod2 =.
+replace pobre_mod2 =0 if ingreso2_hd>=lp_moderada & ingreso2_hd<. & cohh==1
+replace pobre_mod2 =1 if ingreso2_hd<lp_moderada & cohh==1
+ta pobre_mod2 [w=pondera]

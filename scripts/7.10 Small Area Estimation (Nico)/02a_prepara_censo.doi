@@ -1,0 +1,566 @@
+use "${path_datain}\arg_dptos_db.dta", clear
+duplicates report cdpto
+destring codpcia, gen(cprov)
+keep cdpto cprov x_cent y_cent
+merge 1:1 cdpto cprov using "${path_datain}\dptos_aglos.dta"
+drop _merge
+* identifico los departamentos por provincia más cercanos a cada aglomerado
+* 1 solo aglomerado por provincia
+duplicates report cprov cdpto
+sort cprov cdpto
+by cprov: egen min=min(caglo)
+by cprov: egen max=max(caglo)
+gen dif =max-min
+gen aglo_p=max if dif ==0
+* dif =0 provincias con un solo aglomerado
+* dif !=0 provincias con más de un aglomerado
+gen masaglo =1 if dif !=0
+/*
+No es problema:
+26 chubut
+	9
+	91 * no en probit
+
+*/
+replace aglo_p = . if cprov ==62
+replace aglo_p = 9 if cprov ==26
+* armo dummies sin problemas (los que tengo en aglo_p)
+foreach a in 7 8 9 10 12 15 17 18 19 20 22 23 25 26 27 29 30 31 32 {
+	gen reg`a' =0
+	replace reg`a' = 1 if aglo_p ==`a'
+}
+
+
+************************* corrijo buenos aires
+* 6 bsas
+* aglos
+*	2
+*	3
+*	33
+*	34
+*	38 * no en probit
+*	93 * no en probit 
+
+loc prov =6
+loc listaa "2 3 33 34"
+foreach a in `listaa' {
+	gen reg`a' =0
+	* distancia de cada dpto 
+	sum x_cent if caglo == `a'
+	loc x=r(mean)
+	sum y_cent if caglo == `a'
+	loc y=r(mean)
+	gen double distancia_`a' =((x_cent-`x')^2+(y_cent-`y')^2)^(1/2) if cprov == `prov'
+}
+egen double dtot = rsum(distancia_*) if cprov == `prov'
+
+foreach a in `listaa' {
+	replace reg`a'  = distancia_`a' / dtot if cprov == `prov'
+}
+drop distancia_* dtot 
+
+*14 cordoba
+*	13
+*	36
+loc prov =14
+loc listaa "13 36"
+foreach a in `listaa' {
+	gen reg`a' =0
+	* distancia de cada dpto 
+	sum x_cent if caglo == `a'
+	loc x=r(mean)
+	sum y_cent if caglo == `a'
+	loc y=r(mean)
+	gen double distancia_`a' =((x_cent-`x')^2+(y_cent-`y')^2)^(1/2) if cprov == `prov'
+}
+egen double dtot = rsum(distancia_*) if cprov == `prov'
+
+foreach a in `listaa' {
+	replace reg`a'  = distancia_`a' / dtot if cprov == `prov'
+}
+drop distancia_* dtot 
+
+
+*30 entrerios
+*	6
+*	14 
+loc prov =30
+loc listaa "6 14"
+foreach a in `listaa' {
+	gen reg`a' =0
+	* distancia de cada dpto 
+	sum x_cent if caglo == `a'
+	loc x=r(mean)
+	sum y_cent if caglo == `a'
+	loc y=r(mean)
+	gen double distancia_`a' =((x_cent-`x')^2+(y_cent-`y')^2)^(1/2) if cprov == `prov'
+}
+egen double dtot = rsum(distancia_*) if cprov == `prov'
+
+foreach a in `listaa' {
+	replace reg`a'  = distancia_`a' / dtot if cprov == `prov'
+}
+drop distancia_* dtot 
+
+*82 santafe
+*	4
+*	5
+*	38 * no en probit
+loc prov =82
+loc listaa "4 5"
+foreach a in `listaa' {
+	gen reg`a' =0
+	* distancia de cada dpto 
+	sum x_cent if caglo == `a'
+	loc x=r(mean)
+	sum y_cent if caglo == `a'
+	loc y=r(mean)
+	gen double distancia_`a' =((x_cent-`x')^2+(y_cent-`y')^2)^(1/2) if cprov == `prov'
+}
+egen double dtot = rsum(distancia_*) if cprov == `prov'
+
+foreach a in `listaa' {
+	replace reg`a'  = distancia_`a' / dtot if cprov == `prov'
+}
+drop distancia_* dtot 
+
+* problema!! 62 rionegro no tiene aglo por que el único es 93 y no hay dummie
+* puede ser chubut o neuquen?
+* 26 chubut
+* 	9 Comodoro Rivadavia - Rada Tilly
+* 58 neuquen
+* 	17 Neuquén - Plottier
+loc prov =82
+loc listaa "9 17"
+foreach a in `listaa' {
+	* distancia de cada dpto 
+	sum x_cent if caglo == `a'
+	loc x=r(mean)
+	sum y_cent if caglo == `a'
+	loc y=r(mean)
+	gen double distancia_`a' =((x_cent-`x')^2+(y_cent-`y')^2)^(1/2) if cprov == 62
+}
+egen double dtot = rsum(distancia_*) if cprov == 62
+
+foreach a in `listaa' {
+	replace reg`a'  = distancia_`a' / dtot if cprov == 62
+}
+egen control=rsum(reg*) 
+ta control
+drop distancia_* dtot control
+drop ndpto nprov naglo aglo_p masaglo dif min max y_cent x_cent
+order cdpto cprov caglo reg2 reg3 reg4 reg5 reg6 reg7 reg8 reg9 reg10 reg12 reg13 reg14 reg15 reg17 reg18 reg19 reg20 reg22 reg23 reg25 reg26 reg27 reg29 reg30 reg31 reg32 reg33 reg34 reg36
+compress
+save "${path_dataout}\dummies_aglo_xdpto.dta", replace
+
+*use "${pathdcenso}\censo2010_fullraw_p_pr10.dta" 
+drop _all
+use "${path_datain}\censo2010_fullraw_p.dta" 
+
+**duplicates report link nviv nhog nper
+
+egen id =group(link nviv nhog)
+gen com =nper
+compress id com
+*duplicates report id com
+sort id com
+* hogarsec
+* Relación con el jefe de hogar  
+/* 
+Código Rótulo
+1 Jefe(a)
+2 Cónyuge
+3 Hijo(a) / hijastro (a)
+4 Yerno / nuera
+5 Nieto(a)
+6 Padre / madre / suegro(a)
+7 Otros familiares
+8 Otros no familiares
+9 Servicio doméstico y sus familiares
+*/
+gen byte relacion=p01
+
+* Miembros de hogares secundarios (personal doméstico y su familia y pensionistas)
+gen	byte hogarsec = 0 if p01 !=0 & p01 !=. 
+*p01 = 9  Servicio domestico y sus familiares
+replace hogarsec = 1 if p01 == 9 
+
+*p01 = 1 Jefe
+gen byte jefe = 0 if p01 !=0 & p01 !=.
+replace jefe = 1 if p01 == 1 
+
+
+*p03 edad
+gen edad = p03 
+* edad al cuadrado
+gen edad2 = edad * edad
+compress edad edad2
+
+*edad1217 edad1824 edad2540 edad4164 edad65 
+gen byte edad11=.
+replace edad11= 0 if edad!=.
+replace edad11= 1 if edad<12
+
+gen byte edad1217=.
+replace edad1217= 0 if edad!=.
+replace edad1217= 1 if edad>=12 & edad<18
+
+gen byte edad1824=.
+replace edad1824= 0 if edad!=.
+replace edad1824= 1 if edad>=18 & edad<25
+
+gen byte edad2540=.
+replace edad2540= 0 if edad!=.
+replace edad2540= 1 if edad>=25 & edad<41
+
+gen byte edad4164=.
+replace edad4164= 0 if edad!=.
+replace edad4164= 1 if edad>=41 & edad<65
+
+
+gen byte edad65=.
+replace edad65= 0 if edad!=.
+replace edad65= 1 if edad>=65 & edad<.
+
+* pric seci secc supi supc 
+/*
+Sabe leer y escribir (condición de alfabetismo - P07):
+Código Rótulo
+1 Sí
+2 No
+*/
+
+
+/* p08
+Código Rótulo
+1 Asiste
+2 Asistió
+3 Nunca asistió
+*/
+
+gen asiste =0 
+replace asiste=1 if p08==1
+
+gen asistio =0
+replace asistio = 1 if p08==2
+
+gen asistionunca =0
+replace asistionunca = 1 if p08==3
+
+
+******** primero creo nivel educativo al estilo indec
+/* NIVEL-ED N(2): Nivel Educativo
+	1= Primaria Incompleta(incluye educación especial)
+	2= Primaria Completa
+	3= Secundaria Incompleta
+	4= Secundaria Completa
+	5= Superior Universitaria Incompleta
+	6= Superior Universitaria Completa 
+	7= Sin instrucción 
+	9= Ns/ Nr
+*/
+
+
+* Nivel educativo
+/* 0= nunca asistió, 
+   1= primario incompleto, 
+   2= primario completo, 
+   3= secundario incompleto, 
+   4= secundario completo, 
+   5= superior incompleto,
+   6= superior completo  */
+/*
+-Nivel educativo que cursa o cursó (P09): nivel que el censado cursó o está cursando en Argentina o en el exterior en la fecha del Censo.
+Código Rótulo
+1 Nivel inicial (jardín/preescolar)
+2 Primario
+3 EGB
+4 Secundario
+5 Polimodal
+6 Superior no universitario
+7 Universitario
+8 Post-universitario
+9 Educación especial (para personas con discapacidad)
+Completó ese nivel (P10):
+Código Rótulo
+1 Sí
+2 No
+3 Ignorado
+*/
+* le empienzan a preguntar a los de 3 y más
+gen byte nivel =.
+* nunca asistio
+replace nivel =0 if edad <=2
+replace nivel =0 if p08 ==3
+replace nivel =1 if p09 ==1
+* prii
+* edu especial = prii
+replace nivel =1 if p09 ==9 
+replace nivel =1 if p09 ==2 & p10 ==2
+replace nivel =1 if p09 ==3 & p10 ==2
+* pric
+replace nivel =2 if p09 ==2 & p10 ==1
+replace nivel =2 if p09 ==3 & p10 ==1
+
+* seci
+replace nivel =3 if p09 ==4 & p10 ==2
+replace nivel =3 if p09 ==5 & p10 ==2
+* secc
+replace nivel =4 if p09 ==4 & p10 ==1
+replace nivel =4 if p09 ==5 & p10 ==1
+* supi
+replace nivel =5 if p09 ==6 & p10 ==2
+replace nivel =5 if p09 ==7 & p10 ==2
+* supc
+replace nivel =6 if p09 ==6 & p10 ==1
+replace nivel =6 if p09 ==7 & p10 ==1
+replace nivel =6 if p09 ==8
+
+
+* Dummy del nivel educativo 
+gen byte prii = 0 if  nivel>=0 & nivel<=6
+replace prii = 1 if  nivel==0 | nivel==1
+
+gen byte pric = 0 if  nivel>=0 & nivel<=6
+replace pric = 1 if  nivel==2
+
+gen byte seci = 0 if  nivel>=0 & nivel<=6
+replace seci = 1 if  nivel==3
+
+gen byte secc = 0 if  nivel>=0 & nivel<=6
+replace secc = 1 if  nivel==4
+
+gen byte supi = 0 if  nivel>=0 & nivel<=6
+replace supi = 1 if  nivel==5
+
+gen byte supc = 0 if  nivel>=0 & nivel<=6
+replace supc = 1 if  nivel==6
+
+*miembros miembros2 
+* Numero de miembros del hogar (de la familia principal)
+
+
+*duplicates report link nviv nhog nper
+gen uno=1
+by id: egen miembros =sum(uno) if hogarsec==0 & relacio!=.
+drop uno
+
+gen miembros2 = miembros * miembros
+replace miembros2=. if miembros>22
+
+*jj_edad jj_edad2 jj_pric jj_seci jj_secc jj_supi jj_supc 
+* datos del jefe
+
+****variables del hogar 
+clonevar hombre = p02
+
+capture drop aux*
+foreach var of varlist edad edad2 pric seci secc supi supc hombre{
+	gen aux =`var' if jefe ==1
+	egen int jj_`var'=max(aux), by(id)
+	drop aux
+}
+
+/*
+foreach var of varlist edad edad2 pric seci secc supi supc hombre{
+	forvalues n = 1(1)9 {
+		gen aux =0
+		replace aux = `var' if relacion == `n'
+		egen int cc_`var'_`n'=max(aux), by(id)
+		drop aux
+	}
+}
+*/
+
+foreach var of varlist edad{
+	gen aux =0
+	replace aux = `var'
+	egen int cc_mean_`var'=mean(aux), by(id)
+	drop aux
+	}
+
+/*
+	foreach var of varlist asiste{
+	gen aux =. 
+	replace aux = `var' if edad < 18
+	egen int cc_mean_`var'=mean(aux), by(id)
+	drop aux
+	}
+*/
+
+
+compress
+
+* Vivienda "precaria"
+
+/* iv1     tipo de vivienda
+   1=Casa, 2=Departamento, 3=Pieza de Inquilinato, 4=Pieza en hotel o pensión, 5=Local no construido para habitacion 
+   
+   iv12_3 La vivienda está ubicada en villa de emergencia (1=si, 2=no)     */
+/*
+Tipo de vivienda particular (V01):
+Código Rótulo
+1 Casa
+2 Rancho
+3 Casilla
+4 Departamento
+5 Pieza en inquilinato
+6 Pieza en hotel familiar o pensión
+7 Local no construido para habitación
+8 Vivienda móvil
+9 Persona/s viviendo en la calle
+*/
+gen byte hv_precaria=.
+replace hv_precaria=1 if v01==5 | v01==6 | v01==7 | v01==8 | v01==9 
+replace hv_precaria=1 if v01==3 | v01==2 
+replace hv_precaria=0 if v01==1 | v01==4 
+label var hv_precaria "vivienda precaria"
+
+*hv_matpreca 
+/*
+Calidad de los materiales (INMAT): refiere a la calidad de los materiales con que están construidas las viviendas (material predominante de los pisos y techos), teniendo en cuenta la solidez, resistencia y capacidad de aislamiento, así como también su terminación.
+Se clasifica la calidad de los materiales en:
+Código Rótulo
+1 Calidad I
+2 Calidad II
+3 Calidad III
+4 Calidad IV
+*/ 
+/*
+-Material predominante1 de los pisos (H05): es la superficie exterior de la base sólida sobre la cual se asienta la estructura de la vivienda. Se distingue:
+Código Rótulo
+1 Cerámica, baldosa, mosaico, mármol, madera o alfombrado
+2 Cemento o ladrillo fijo
+3 Tierra o ladrillo suelto
+4 Otros
+-Material de la cubierta exterior del techo (H06): es el material predominante del techo que se observa del lado de afuera de una vivienda. En los departamentos ubicados en construcciones verticales, la cubierta exterior del techo remite al material que constituye el techo de la última planta.
+Código Rótulo
+1 Cubierta asfáltica o membrana
+2 Baldosa o losa
+3 Pizarra o teja
+4 Chapa de metal
+5 Chapa de fibrocementos o plástico
+6 Chapa de cartón
+7 Caña, palma, tabla o paja con o sin barro
+8 Otro
+-Revestimiento interior o cielorraso del techo (H07): cobertura del techo del lado de adentro de una vivienda (revestimiento interior), que puede ser revoque, yeso, madera y/o placas de poliestireno expandido, etcétera. El cielorraso es un aislamiento adicional al techo que sirve para proteger a los habitantes de los ruidos y de las inclemencias climáticas. Cuando alguna/s de las habitaciones de la vivienda no tenga/n cielorraso, se registra la situación predominante.
+Código Rótulo
+1 Si tiene
+2 No tiene
+*/
+
+gen hv_matpreca =.
+replace hv_matpreca =1 if (h05 ==3 | h06 ==6 | h06 ==7)
+replace hv_matpreca =0 if (h05 <=2 & h06 <=5)
+* los missing son los que tienen h05 =4 o h06 =8 completo con inmat
+replace hv_matpreca =0 if hv_matpreca ==. & inmat==4
+replace hv_matpreca =1 if hv_matpreca ==. & inmat<=3
+
+*
+**************************
+* agua y cloacas
+**************************
+
+/*
+-Tenencia de agua (H08): forma en que el hogar accede al agua que utiliza. Las categorías son:
+Código Rótulo
+1 Por cañería dentro de la vivienda
+2 Fuera de la vivienda pero dentro del terreno
+3 Fuera del terreno
+Procedencia del agua para beber y cocinar (H09): fuente y sistema de abastecimiento del agua que el hogar utiliza para beber y cocinar. En caso de abastecerse con más de una fuente, se considera la que predomina en el uso cotidiano del hogar. Las categorías son:
+Código Rótulo
+1 Red pública
+2 Perforación con bomba a motor
+3 Perforación con bomba manual
+4 Pozo
+5 Transporte por cisterna
+6 Agua de lluvia, río, canal, arroyo o acequia
+*/
+
+gen byte hv_agua =.
+replace hv_agua = 0 if h08 ==3
+replace hv_agua = 0 if h09 >=2 & h09<=6
+replace hv_agua = 1 if (h08 ==1 | h08 ==2) & h09==1
+
+
+/*
+Tiene baño o letrina (H10): refiere a la disponibilidad de un espacio cerrado por paredes que se elevan del suelo hasta el techo, o por tabiques (pared que se eleva desde el suelo hasta una altura de dos metros), utilizado por el hogar para la evacuación de excretas. El baño / letrina puede estar dentro o fuera de la vivienda y ser de uso exclusivo del hogar o compartido con otros hogares.
+Código Rótulo
+1 Si tiene
+2 No tiene
+
+-Tiene botón, cadena, mochila para limpieza del inodoro (H11): implica la disponibilidad de un sistema automático o semi-automático de descarga de agua para la limpieza del inodoro (artefacto instalado dentro del baño/letrina).
+Código Rótulo
+1 Si tiene
+2 No tiene
+
+-Desagüe del inodoro (H12): disponibilidad de un sistema de cañerías que permite el arrastre del agua y la eliminación de las excretas del inodoro. Las categorías son:
+Código Rótulo
+1 A red pública
+2 A cámara séptica y pozo ciego
+3 Sólo a pozo ciego
+4 A hoyo, excavación en la tierra, etc.
+*/
+gen byte hv_banio =1 if h10==1
+replace hv_banio =0 if h10==2
+
+gen byte hv_cloacas =.
+replace hv_cloacas = 0 if h10 ==2 | h12 ==2 | h12 ==3 | h12 ==4 | h11==2 | h11==3
+replace hv_cloacas = 1 if h12 ==1 & h11==1 
+
+
+
+    
+* Propiedad de la vivienda
+
+/* II7	N(2):  Régimen de tenencia 
+		   01= Propietario de la vivienda y el terreno	
+		   02= Propietario de la vivienda solamente
+		   03= Inquilino/arrendatario de la vivienda
+		   04= Ocupante por pago de impuestos/expensas
+		   05= Ocupante en relación de dependencia
+		   06= Ocupante gratuito (con permiso)
+		   07= Ocupante de hecho (sin permiso)
+		   08= Esta en sucesión?
+		   09= Otra situación (especificar)  */
+/*
+-Tenencia de la vivienda y propiedad del terreno (PROP): refiere al conjunto de normas jurídico-legales o de hecho en virtud de los cuales el hogar ocupa toda o parte de una vivienda. Las categorías son:
+Código Rótulo
+1 Propietario de la vivienda y del terreno
+2 Propietario sólo de la vivienda
+3 Inquilino
+4 Ocupante por préstamo
+5 Ocupante por trabajo
+6 Otra situación
+*/
+gen hv_propieta =.
+replace hv_propieta =1 if prop ==1 
+replace hv_propieta =0 if (prop>=2 & prop<=6)
+label var hv_propieta "propietario de la vivienda"
+
+
+
+* Numero de habitaciones de uso exclusivo no contando el banio y la cocina 
+
+/* II1 N(2):  ¿cuántos ambientes/habitaciones tiene este hogar para su uso exclusivo? */
+/*
+Total de habitaciones o piezas (H16): se considera al total de habitaciones o piezas que dispone el hogar, incluyendo las que se encuentran en condiciones para dormir. Se contabiliza: el comedor, living, (aunque se encuentren integrados a la cocina: cocina-comedor) y los entrepisos (construidos en algunas viviendas, pese a no tener alguna de las paredes señaladas en la definición); se excluyen: baños, cocinas (usadas exclusivamente para cocinar), lavaderos, garajes, pasillos, halls, recibidores y galpones (siempre y cuando no se utilicen para que duerma una persona) y quinchos sin cerramiento.
+*/
+gen habita=.
+replace habita=h16
+replace habita=. if habita<=0 
+label var habita "habitaciones uso exclusivo"
+
+
+gen hv_miemhabi=miembros/habita
+compress
+
+* reg3 reg4 reg5 reg6 reg7 reg8 reg9 reg10 reg12 reg13 reg14 reg15 reg17 reg18 reg19 reg20 reg22 reg23 reg25 reg26 reg27 reg29 reg30 reg31 reg32 reg33 reg34 reg36
+ren prov cprov 
+ren dpto cdpto
+
+merge m:1 cdpto cprov using "${path_datain}\dummies_aglo_xdpto.dta"	
+ta _merge
+
+gen aglomerado = caglo 
+

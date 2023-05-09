@@ -1,0 +1,156 @@
+*cuantiles ipcf [w=pondera] if ipcf>=0 & cohh==1, n(10) orden_aux (id relacion edad) g(dipcf)
+
+
+******************************************************************************************
+******** VARIABLES NECESARIAS PARA QUE CORRA EL DO ********
+******************************************************************************************
+******************************************************************************************
+
+capture drop nbi*
+gen region =region_ephc
+capture gen asistencia =.
+
+* Hijos menores de 12 años (hogar principal)
+gen	m12 = 0
+replace m12 = 1  if  edad<=12		
+replace m12 = 0  if  hogarsec==1
+
+* Numero de menores de 12 en el hogar principal   
+egen m12h = sum(m12), by(id)
+
+* Tasa de dependencia
+gen depen = miembros/n_perii_h
+label var depen "Tasa de dependencia"
+
+* Asistencia social 
+
+egen aux = sum(asistencia) if asistencia~=., by(id)
+gen	asist_hog = .
+replace asist_hog = 0  if  aux==0
+replace asist_hog = 1  if  aux>0 & aux~=.
+drop aux
+
+* Miembro de hogar con jefe mujer
+gen	aux = 0
+replace aux = 1  if jefe==1 & hombre==0
+egen mujer_jefe=sum(aux), by(id)
+drop aux
+
+* Miembros por habitacion
+gen per_habita = miembros/habita
+
+* Informalidad
+gen inf_jubi = 1-djubila
+replace inf_jubi = . if relab!=2
+
+********************* NBI ************************
+capture drop nbi*
+* Criterio 1: Más de 4 miembros por habitación
+gen   miemhab = miembros/habita
+
+gen	nbih1 = .
+replace nbih1 = 1  if  jefe==1  &  miemhab>=4  &  miemhab<.
+replace nbih1 = 0  if  jefe==1  &  miemhab<=3  &  miemhab>0
+egen	 nbi1 = max(nbih1), by(id)
+
+* Criterio 2: Vivienda precaria 
+gen	nbih2 = .
+replace nbih2 = 1  if  jefe==1  &  precaria==1
+replace nbih2 = 0  if  jefe==1  &  precaria==0
+egen     nbi2 = max(nbih2), by(id)
+
+* Criterio 3: Materiales precarios 
+gen	nbih3 = .
+replace nbih3 = 1  if  jefe==1  &  matpreca==1
+replace nbih3 = 0  if  jefe==1  &  matpreca==0
+egen	 nbi3 = max(nbih3), by(id)
+
+* Criterio 4: Sin agua 
+gen	nbih4 = .
+replace nbih4 = 1  if  jefe==1  &  agua==0
+replace nbih4 = 0  if  jefe==1  &  agua==1
+egen    nbi4  = max(nbih4), by(id)
+
+* Criterio 5: Sin baño con arrastre de agua 
+gen	nbih5 = .
+replace nbih5 = 1  if  jefe==1  &  banio==0
+replace nbih5 = 0  if  jefe==1  &  banio==1
+egen	 nbi5 = max(nbih5), by(id)
+
+* Criterio 6: Niños entre 7 y 11 que no van a la escuela
+* Niños que no asisten 
+gen      aux = 0
+replace  aux = 1  if  edad>=7  &  edad<=11  &  asiste==0
+egen    aux2 = sum(aux), by(id)
+
+* Niños en el hogar  
+gen     aux3 = 0
+replace aux3 = 1  if  edad>=7  &  edad<=11 
+egen    aux4 = sum(aux3), by(id)
+
+gen	nbih6 = .
+replace nbih6 = 1  if  jefe==1  &  aux2>=1 
+replace nbih6 = 0  if  jefe==1  &  aux2==0 
+replace nbih6 = .  if  jefe==1  &  aux4==0 
+drop aux*
+egen     nbi6 = max(nbih6), by(id)
+
+* Criterio 7: Jefe con baja educación (proxy de educación primaria incompleta)
+gen	nbih7 = .
+replace nbih7 = 1  if  jefe==1 & aedu<=4
+replace nbih7 = 0  if  jefe==1 & aedu>=5 & aedu<.
+egen	 nbi7 = max(nbih7), by(id)
+
+* Criterio 8: Jefe sin educación secundaria completa y más de 4 miembros por perceptor de ingreso
+gen aux = miembros/n_perii_h
+gen	nbih8 = .
+replace nbih8 = 1  if  jefe==1  &  aedu<=9  &  aux>=4  &  aux<. 
+replace nbih8 = 0  if  jefe==1  &  aedu<=9  &  aux<4 
+replace nbih8 = 0  if  jefe==1  &  aedu>9   &  aedu<.
+drop aux 
+egen     nbi8 = max(nbih8), by(id)
+
+* Define pobreza NBI
+egen	suma_nbih = rsum(nbih1 nbih2 nbih3 nbih4 nbih5 nbih6 nbih7 nbih8)
+replace suma_nbih = .  if  (nbih1==. & nbih2==. & nbih3==. & nbih4==. & nbih5==. & nbih6==. & nbih7==. & nbih8==.)
+
+egen	suma_nbi = rsum(nbi1 nbi2 nbi3 nbi4 nbi5 nbi6 nbi7 nbi8)
+replace suma_nbi = .  if  (nbi1==. & nbi2==. & nbi3==. & nbi4==. & nbi5==. & nbi6==. & nbi7==. & nbi8==.)
+
+gen	nbih = .
+replace nbih = 1  if  jefe==1  &  suma_nbih>0  &  suma_nbi<.
+replace nbih = 0  if  jefe==1  &  suma_nbih==0 
+egen	 nbi = max(nbih), by(id)
+label var nbi "Individuo en hogar con NBI" 
+
+
+gen aglo_orden =.
+replace aglo_orden =1	if region_est2 == 2
+replace aglo_orden =2	if region_est2 == 3
+replace aglo_orden =3	if region_est2 == 4
+replace aglo_orden =4	if region_est2 == 5
+replace aglo_orden =5	if region_est2 == 6
+replace aglo_orden =6	if region_est2 == 7
+replace aglo_orden =7	if region_est2 == 8
+replace aglo_orden =8	if region_est2 == 9
+replace aglo_orden =9	if region_est2 == 10
+replace aglo_orden =10	if region_est2 == 12
+replace aglo_orden =11	if region_est2 == 13
+replace aglo_orden =12	if region_est2 == 14
+replace aglo_orden =13	if region_est2 == 15
+replace aglo_orden =14	if region_est2 == 17
+replace aglo_orden =15	if region_est2 == 18
+replace aglo_orden =16	if region_est2 == 19
+replace aglo_orden =17	if region_est2 == 20
+replace aglo_orden =18	if region_est2 == 22
+replace aglo_orden =19	if region_est2 == 23
+replace aglo_orden =20	if region_est2 == 25
+replace aglo_orden =21	if region_est2 == 26
+replace aglo_orden =22	if region_est2 == 27
+replace aglo_orden =23	if region_est2 == 29
+replace aglo_orden =24	if region_est2 == 30
+replace aglo_orden =25	if region_est2 == 31
+replace aglo_orden =26	if region_est2 == 32
+replace aglo_orden =27	if region_est2 == 33
+replace aglo_orden =28	if region_est2 == 34
+replace aglo_orden =29	if region_est2 == 36
